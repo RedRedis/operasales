@@ -38,28 +38,4 @@ public class PremiereRepositoryImpl implements PremiereRepository {
         return repository.remove(name);
     }
 
-    @Override
-    public Ticket buyTicket(String name) {
-        Premiere premiere = repository.get(name);
-        if (premiere != null && premiere.getAvailableSeats() > 0) {
-            Ticket ticket = new Ticket((int)(2_000_000_000 * Math.random()), premiere.getName());
-            premiere.getTickets().add(ticket);
-            premiere.setAvailableSeats(premiere.getAvailableSeats() - 1);
-            return ticket;
-        }
-        return null;
-    }
-
-    @Override
-    public boolean returnTicket(Ticket ticket) {
-        Premiere premiere = repository.get(ticket.getNameOfPremiere());
-        if (premiere != null) {
-            if (premiere.getTickets().contains(ticket)) {
-                premiere.getTickets().remove(ticket);
-                premiere.setAvailableSeats(premiere.getAvailableSeats() + 1);
-                return true;
-            }
-        }
-        return false;
-    }
 }

@@ -11,6 +11,4 @@ public interface PremiereRepository {
     List<Premiere> getAll();
     void create(Premiere premiere);
     Premiere delete(String name);
-    Ticket buyTicket(String name);
-    boolean returnTicket(Ticket ticket);
 }
