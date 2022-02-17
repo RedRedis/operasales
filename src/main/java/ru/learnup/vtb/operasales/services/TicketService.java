@@ -2,6 +2,7 @@ package ru.learnup.vtb.operasales.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.learnup.vtb.operasales.annotations.Email;
 import ru.learnup.vtb.operasales.entities.Premiere;
 import ru.learnup.vtb.operasales.entities.Ticket;
 import ru.learnup.vtb.operasales.repositories.PremiereRepository;
@@ -16,6 +17,7 @@ public class TicketService {
         this.repository = repository;
     }
 
+    @Email
     public Ticket buyTicket(String name) {
         Premiere premiere = repository.get(name);
         if (premiere != null && premiere.getAvailableSeats() > 0) {

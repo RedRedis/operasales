@@ -2,6 +2,7 @@ package ru.learnup.vtb.operasales.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.learnup.vtb.operasales.annotations.Email;
 import ru.learnup.vtb.operasales.entities.Premiere;
 import ru.learnup.vtb.operasales.repositories.PremiereRepository;
 
@@ -35,7 +36,8 @@ public class PremiereService {
         return premiere.toString();
     }
 
-    public void createPremiere(Premiere premiere) {
+    @Email
+    public Premiere createPremiere(Premiere premiere) {
         if (premiere.getName() == null || premiere.getName().isEmpty()) {
             throw new IllegalArgumentException("Null or empty name");
         }
@@ -49,9 +51,11 @@ public class PremiereService {
             throw new IllegalArgumentException("Available seat cannot be less then 0");
         }
         repository.create(premiere);
+        return premiere;
     }
 
-    public void changePremiere(Premiere changePremiere) {
+    @Email
+    public Premiere changePremiere(Premiere changePremiere) {
 
         if (changePremiere.getName() == null || changePremiere.getName().isEmpty()) {
             throw new IllegalArgumentException("Null or empty name for getting premiere");
@@ -72,6 +76,7 @@ public class PremiereService {
         if (premiere.getAvailableSeats() != null && premiere.getAvailableSeats() >= 0) {
             premiere.setAvailableSeats(changePremiere.getAvailableSeats());
         }
+        return premiere;
     }
 
     public Premiere deletePremiere(String name) {
