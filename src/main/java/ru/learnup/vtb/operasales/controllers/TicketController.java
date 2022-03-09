@@ -24,8 +24,8 @@ public class TicketController {
         }
     }
 
-    public void returnTicket(Integer number, String name) {
-        if (service.returnTicket(new Ticket(number, name))) {
+    public void returnTicket(Integer number) {
+        if (service.returnTicket(number)) {
             System.out.println("ticket is returned");
         } else {
             System.out.println("ticket is not found");

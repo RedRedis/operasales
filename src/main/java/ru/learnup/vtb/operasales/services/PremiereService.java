@@ -20,7 +20,7 @@ public class PremiereService {
     }
 
     public List<String> getAllPremiere() {
-        List<Premiere> premieres = repository.getAll();
+        List<Premiere> premieres = repository.findAll();
         List<String> names = new ArrayList<>();
         for (Premiere premiere : premieres) {
             names.add(premiere.getName());
@@ -29,7 +29,7 @@ public class PremiereService {
     }
 
     public String getPremiereInfo(String name) {
-        Premiere premiere = repository.get(name);
+        Premiere premiere = repository.findByName(name);
         if (premiere == null) {
             return "No such premiere";
         }
@@ -50,7 +50,7 @@ public class PremiereService {
         if (premiere.getAvailableSeats() == null || premiere.getAvailableSeats() < 0) {
             throw new IllegalArgumentException("Available seat cannot be less then 0");
         }
-        repository.create(premiere);
+        repository.save(premiere);
         return premiere;
     }
 
@@ -61,7 +61,7 @@ public class PremiereService {
             throw new IllegalArgumentException("Null or empty name for getting premiere");
         }
 
-        Premiere premiere = repository.get(changePremiere.getName());
+        Premiere premiere = repository.findByName(changePremiere.getName());
 
         if (premiere == null) {
             throw new IllegalArgumentException("No such premiere for changing");
@@ -76,11 +76,16 @@ public class PremiereService {
         if (premiere.getAvailableSeats() != null && premiere.getAvailableSeats() >= 0) {
             premiere.setAvailableSeats(changePremiere.getAvailableSeats());
         }
+        repository.save(premiere);
         return premiere;
     }
 
     public Premiere deletePremiere(String name) {
-        return repository.delete(name);
+        Premiere premiere = repository.findByName(name);
+        if (premiere != null) {
+            repository.delete(premiere);
+        }
+        return premiere;
     }
 
 }

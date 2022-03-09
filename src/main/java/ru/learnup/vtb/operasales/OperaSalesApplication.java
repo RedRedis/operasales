@@ -7,8 +7,6 @@ import ru.learnup.vtb.operasales.controllers.PremiereController;
 import ru.learnup.vtb.operasales.controllers.TicketController;
 import ru.learnup.vtb.operasales.entities.Premiere;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Scanner;
 
 @SpringBootApplication
@@ -19,14 +17,14 @@ public class OperaSalesApplication {
 
         //1
         ctx.getBean(PremiereController.class).getAllPremiere();
-        ctx.getBean(PremiereController.class).createPremiere(new Premiere("Flowers", "About Flowers", 15, 400, new HashSet<>()));
+        ctx.getBean(PremiereController.class).createPremiere(new Premiere(null, "Flowers", "About Flowers", 15, 400, null));
         System.out.println();
         ctx.getBean(PremiereController.class).getAllPremiere();
 
         //2
         System.out.println();
         ctx.getBean(PremiereController.class).getPremiereInfo("Flowers");
-        ctx.getBean(PremiereController.class).changePremiere(new Premiere("Flowers", null, null, 1000, null));
+        ctx.getBean(PremiereController.class).changePremiere(new Premiere(null, "Flowers", null, null, 1000, null));
         ctx.getBean(PremiereController.class).getPremiereInfo("Flowers");
 
         //3
@@ -50,9 +48,7 @@ public class OperaSalesApplication {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Input number of ticket for return:");
         int number = scanner.nextInt();
-        System.out.println("Input name of premiere for return ticket:");
-        String name = scanner.next();
-        ctx.getBean(TicketController.class).returnTicket(number, name);
+        ctx.getBean(TicketController.class).returnTicket(number);
         ctx.getBean(PremiereController.class).getPremiereInfo("Spider");
     }
 

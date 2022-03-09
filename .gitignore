@@ -3,3 +3,5 @@ target/
 .idea/
 mvnw*
 *.iml
+docker-compose.yml
+postgres-data

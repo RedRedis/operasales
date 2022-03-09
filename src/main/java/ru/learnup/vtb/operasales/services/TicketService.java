@@ -6,35 +6,41 @@ import ru.learnup.vtb.operasales.annotations.Email;
 import ru.learnup.vtb.operasales.entities.Premiere;
 import ru.learnup.vtb.operasales.entities.Ticket;
 import ru.learnup.vtb.operasales.repositories.PremiereRepository;
+import ru.learnup.vtb.operasales.repositories.TicketRepository;
 
 @Service
 public class TicketService {
 
     private static PremiereRepository repository;
+    private static TicketRepository ticketRepository;
 
     @Autowired
-    public TicketService(PremiereRepository repository) {
+    public TicketService(PremiereRepository repository, TicketRepository ticketRepository) {
         this.repository = repository;
+        this.ticketRepository = ticketRepository;
     }
 
     @Email
     public Ticket buyTicket(String name) {
-        Premiere premiere = repository.get(name);
+        Premiere premiere = repository.findByName(name);
         if (premiere != null && premiere.getAvailableSeats() > 0) {
-            Ticket ticket = new Ticket((int)(2_000_000_000 * Math.random()), premiere.getName());
-            premiere.getTickets().add(ticket);
+            Ticket ticket = new Ticket(null, (int)(2_000_000_000 * Math.random()), premiere);
             premiere.setAvailableSeats(premiere.getAvailableSeats() - 1);
+            repository.save(premiere);
+            ticketRepository.save(ticket);
             return ticket;
         }
         return null;
     }
 
-    public boolean returnTicket(Ticket ticket) {
-        Premiere premiere = repository.get(ticket.getNameOfPremiere());
-        if (premiere != null) {
-            if (premiere.getTickets().contains(ticket)) {
-                premiere.getTickets().remove(ticket);
+    public boolean returnTicket(Integer number) {
+        Ticket ticket = ticketRepository.findByNumber(number);
+        if (ticket != null) {
+            Premiere premiere = repository.findByName(ticket.getPremiere().getName());
+            if (premiere != null) {
                 premiere.setAvailableSeats(premiere.getAvailableSeats() + 1);
+                repository.save(premiere);
+                ticketRepository.delete(ticket);
                 return true;
             }
         }

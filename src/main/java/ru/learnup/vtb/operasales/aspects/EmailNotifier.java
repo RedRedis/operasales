@@ -1,9 +1,7 @@
 package ru.learnup.vtb.operasales.aspects;
 
 
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
@@ -22,15 +20,14 @@ import ru.learnup.vtb.operasales.services.TicketService;
 public class EmailNotifier {
 
     private JavaMailSender mailSender;
-
-    @Value("${spring.mail.username}")
     private String from;
-    @Value("${spring.to}")
     private String to;
 
     @Autowired
-    public EmailNotifier(JavaMailSender mailSender) {
+    public EmailNotifier(JavaMailSender mailSender, @Value("${spring.mail.username}") String from, @Value("${spring.to}") String to) {
         this.mailSender = mailSender;
+        this.from = from;
+        this.to = to;
     }
 
     @Pointcut("@annotation(ru.learnup.vtb.operasales.annotations.Email)")
@@ -56,7 +53,7 @@ public class EmailNotifier {
         try {
             Ticket ticket = (Ticket) point.proceed();
             message.setSubject("Buy ticket");
-            message.setText("Ticket number: " + ticket.getNumber() + ", premiere: " + ticket.getNameOfPremiere());
+            message.setText("Ticket number: " + ticket.getNumber() + ", premiere: " + ticket.getPremiere().getName());
         } catch (Throwable e) {}
     }
 

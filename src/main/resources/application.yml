@@ -1,13 +1,19 @@
 spring:
-  to: your-email@yandex.ru
+  to: andre-bd@yandex.ru
   mail:
     host: smtp.yandex.ru
-    username: "sent-email@yandex.ru"
-    password: "password"
+    username: "redis-test@yandex.ru"
+    password: "RediS_test@733"
     port: 465
     protocol: smtps
     properties:
       mail.smtp:
         auth: true
         starttls.enable: true
+
+  datasource:
+    url: "jdbc:postgresql://localhost:5432/postgres"
+    username: "postgres"
+    password: "postgres"
+    driver-class-name: "org.postgresql.Driver"
 
