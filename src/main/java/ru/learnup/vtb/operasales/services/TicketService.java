@@ -11,6 +11,10 @@ import ru.learnup.vtb.operasales.entities.Ticket;
 import ru.learnup.vtb.operasales.repositories.PremiereRepository;
 import ru.learnup.vtb.operasales.repositories.TicketRepository;
 
+import java.io.EOFException;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 @Service
 public class TicketService {
 
@@ -26,8 +30,8 @@ public class TicketService {
     @Email
     @Transactional(
             propagation = Propagation.REQUIRES_NEW,
-            isolation = Isolation.DEFAULT,
-            timeout = 2
+            timeout = 2,
+            rollbackFor = {FileNotFoundException.class, IOException.class, EOFException.class}
     )
     public Ticket buyTicket(String name) {
         Premiere premiere = repository.findByName(name);
@@ -43,7 +47,7 @@ public class TicketService {
 
     @Transactional(
             propagation = Propagation.REQUIRES_NEW,
-            isolation = Isolation.DEFAULT
+            rollbackFor = {FileNotFoundException.class, IOException.class, EOFException.class}
     )
     public boolean returnTicket(Integer number) {
         Ticket ticket = ticketRepository.findByNumber(number);

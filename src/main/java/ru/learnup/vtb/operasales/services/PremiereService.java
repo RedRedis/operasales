@@ -9,6 +9,9 @@ import ru.learnup.vtb.operasales.annotations.Email;
 import ru.learnup.vtb.operasales.entities.Premiere;
 import ru.learnup.vtb.operasales.repositories.PremiereRepository;
 
+import java.io.EOFException;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,8 +47,8 @@ public class PremiereService {
     @Email
     @Transactional(
             propagation = Propagation.REQUIRES_NEW,
-            isolation = Isolation.DEFAULT,
-            timeout = 2
+            timeout = 2,
+            rollbackFor = {FileNotFoundException.class, IOException.class, EOFException.class}
     )
     public Premiere createPremiere(Premiere premiere) {
         if (premiere.getName() == null || premiere.getName().isEmpty()) {
@@ -66,9 +69,8 @@ public class PremiereService {
 
     @Email
     @Transactional(
-            propagation = Propagation.REQUIRED,
-            isolation = Isolation.DEFAULT,
-            timeout = 2
+            timeout = 2,
+            rollbackFor = {FileNotFoundException.class, IOException.class, EOFException.class}
     )
     public Premiere changePremiere(Premiere changePremiere) {
 
@@ -97,7 +99,7 @@ public class PremiereService {
 
     @Transactional(
             propagation = Propagation.REQUIRES_NEW,
-            isolation = Isolation.DEFAULT
+            rollbackFor = {FileNotFoundException.class, IOException.class, EOFException.class}
     )
     public Premiere deletePremiere(String name) {
         Premiere premiere = repository.findByName(name);
