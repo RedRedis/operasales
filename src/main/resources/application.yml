@@ -1,8 +1,8 @@
 spring:
-  to: youremail@yandex.ru
+  to: your_email
   mail:
     host: smtp.yandex.ru
-    username: "sendemanil@yandex.ru"
+    username: "send_email"
     password: "password"
     port: 465
     protocol: smtps

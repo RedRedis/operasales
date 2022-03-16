@@ -2,6 +2,9 @@ package ru.learnup.vtb.operasales.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.learnup.vtb.operasales.annotations.Email;
 import ru.learnup.vtb.operasales.entities.Premiere;
 import ru.learnup.vtb.operasales.repositories.PremiereRepository;
@@ -19,6 +22,7 @@ public class PremiereService {
         this.repository = repository;
     }
 
+    @Transactional(readOnly = true)
     public List<String> getAllPremiere() {
         List<Premiere> premieres = repository.findAll();
         List<String> names = new ArrayList<>();
@@ -28,6 +32,7 @@ public class PremiereService {
         return names;
     }
 
+    @Transactional(readOnly = true)
     public String getPremiereInfo(String name) {
         Premiere premiere = repository.findByName(name);
         if (premiere == null) {
@@ -37,6 +42,11 @@ public class PremiereService {
     }
 
     @Email
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
+            isolation = Isolation.DEFAULT,
+            timeout = 2
+    )
     public Premiere createPremiere(Premiere premiere) {
         if (premiere.getName() == null || premiere.getName().isEmpty()) {
             throw new IllegalArgumentException("Null or empty name");
@@ -55,6 +65,11 @@ public class PremiereService {
     }
 
     @Email
+    @Transactional(
+            propagation = Propagation.REQUIRED,
+            isolation = Isolation.DEFAULT,
+            timeout = 2
+    )
     public Premiere changePremiere(Premiere changePremiere) {
 
         if (changePremiere.getName() == null || changePremiere.getName().isEmpty()) {
@@ -80,6 +95,10 @@ public class PremiereService {
         return premiere;
     }
 
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
+            isolation = Isolation.DEFAULT
+    )
     public Premiere deletePremiere(String name) {
         Premiere premiere = repository.findByName(name);
         if (premiere != null) {

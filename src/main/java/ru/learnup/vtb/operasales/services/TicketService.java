@@ -2,6 +2,9 @@ package ru.learnup.vtb.operasales.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.learnup.vtb.operasales.annotations.Email;
 import ru.learnup.vtb.operasales.entities.Premiere;
 import ru.learnup.vtb.operasales.entities.Ticket;
@@ -21,6 +24,11 @@ public class TicketService {
     }
 
     @Email
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
+            isolation = Isolation.DEFAULT,
+            timeout = 2
+    )
     public Ticket buyTicket(String name) {
         Premiere premiere = repository.findByName(name);
         if (premiere != null && premiere.getAvailableSeats() > 0) {
@@ -33,6 +41,10 @@ public class TicketService {
         return null;
     }
 
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
+            isolation = Isolation.DEFAULT
+    )
     public boolean returnTicket(Integer number) {
         Ticket ticket = ticketRepository.findByNumber(number);
         if (ticket != null) {
