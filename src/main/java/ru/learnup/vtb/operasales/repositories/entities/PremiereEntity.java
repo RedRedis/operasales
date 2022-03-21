@@ -1,4 +1,4 @@
-package ru.learnup.vtb.operasales.entities;
+package ru.learnup.vtb.operasales.repositories.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,7 +7,6 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Collection;
-import java.util.Set;
 
 @Entity
 @Table(name="premiere", schema="opera")
@@ -15,12 +14,12 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Premiere {
+public class PremiereEntity {
 
     @Id
     @Column(name="id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name="name")
     private String name;
@@ -35,7 +34,7 @@ public class Premiere {
     private Integer availableSeats;
 
     @OneToMany(mappedBy = "premiere", fetch = FetchType.EAGER)
-    private Collection<Ticket> tickets;
+    private Collection<TicketEntity> tickets;
 
     @Override
     public String toString() {

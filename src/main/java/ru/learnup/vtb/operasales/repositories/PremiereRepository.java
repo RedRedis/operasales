@@ -2,10 +2,10 @@ package ru.learnup.vtb.operasales.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import ru.learnup.vtb.operasales.entities.Premiere;
+import ru.learnup.vtb.operasales.repositories.entities.PremiereEntity;
 
 @Repository
-public interface PremiereRepository extends JpaRepository<Premiere, Long> {
+public interface PremiereRepository extends JpaRepository<PremiereEntity, Long> {
 
-    Premiere findByName(String name);
+    PremiereEntity findByName(String name);
 }

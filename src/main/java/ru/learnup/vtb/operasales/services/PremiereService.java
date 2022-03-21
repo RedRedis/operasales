@@ -2,46 +2,43 @@ package ru.learnup.vtb.operasales.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.learnup.vtb.operasales.annotations.Email;
-import ru.learnup.vtb.operasales.entities.Premiere;
+import ru.learnup.vtb.operasales.mappers.PremiereMapper;
+import ru.learnup.vtb.operasales.model.Premiere;
+import ru.learnup.vtb.operasales.repositories.entities.PremiereEntity;
 import ru.learnup.vtb.operasales.repositories.PremiereRepository;
 
 import java.io.EOFException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PremiereService {
 
-    private static PremiereRepository repository;
+    private PremiereRepository repository;
+    private PremiereMapper mapper;
 
     @Autowired
-    public PremiereService(PremiereRepository repository) {
+    public PremiereService(PremiereRepository repository, PremiereMapper mapper) {
         this.repository = repository;
+        this.mapper = mapper;
     }
 
     @Transactional(readOnly = true)
-    public List<String> getAllPremiere() {
-        List<Premiere> premieres = repository.findAll();
-        List<String> names = new ArrayList<>();
-        for (Premiere premiere : premieres) {
-            names.add(premiere.getName());
-        }
-        return names;
+    public List<Premiere> getAll() {
+       return repository.findAll().stream()
+               .map(mapper::toDomain)
+               .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public String getPremiereInfo(String name) {
-        Premiere premiere = repository.findByName(name);
-        if (premiere == null) {
-            return "No such premiere";
-        }
-        return premiere.toString();
+    public Premiere get(long id) {
+        return mapper.toDomain(
+                repository.getById(id));
     }
 
     @Email
@@ -50,7 +47,7 @@ public class PremiereService {
             timeout = 2,
             rollbackFor = {FileNotFoundException.class, IOException.class, EOFException.class}
     )
-    public Premiere createPremiere(Premiere premiere) {
+    public Premiere save(Premiere premiere) {
         if (premiere.getName() == null || premiere.getName().isEmpty()) {
             throw new IllegalArgumentException("Null or empty name");
         }
@@ -63,8 +60,9 @@ public class PremiereService {
         if (premiere.getAvailableSeats() == null || premiere.getAvailableSeats() < 0) {
             throw new IllegalArgumentException("Available seat cannot be less then 0");
         }
-        repository.save(premiere);
-        return premiere;
+        return mapper.toDomain(
+                repository.save(
+                        mapper.toEntity(premiere)));
     }
 
     @Email
@@ -72,13 +70,13 @@ public class PremiereService {
             timeout = 2,
             rollbackFor = {FileNotFoundException.class, IOException.class, EOFException.class}
     )
-    public Premiere changePremiere(Premiere changePremiere) {
+    public Premiere update(Premiere changePremiere) {
 
         if (changePremiere.getName() == null || changePremiere.getName().isEmpty()) {
             throw new IllegalArgumentException("Null or empty name for getting premiere");
         }
 
-        Premiere premiere = repository.findByName(changePremiere.getName());
+        Premiere premiere = get(changePremiere.getId());
 
         if (premiere == null) {
             throw new IllegalArgumentException("No such premiere for changing");
@@ -93,20 +91,22 @@ public class PremiereService {
         if (premiere.getAvailableSeats() != null && premiere.getAvailableSeats() >= 0) {
             premiere.setAvailableSeats(changePremiere.getAvailableSeats());
         }
-        repository.save(premiere);
-        return premiere;
+        return mapper.toDomain(
+                repository.save(
+                        mapper.toEntity(premiere)));
     }
 
     @Transactional(
             propagation = Propagation.REQUIRES_NEW,
             rollbackFor = {FileNotFoundException.class, IOException.class, EOFException.class}
     )
-    public Premiere deletePremiere(String name) {
-        Premiere premiere = repository.findByName(name);
-        if (premiere != null) {
-            repository.delete(premiere);
+    public Premiere delete(long id) {
+        PremiereEntity premiere = repository.getById(id);
+        if (premiere == null) {
+            throw new IllegalArgumentException("No such premiere for delete");
         }
-        return premiere;
+        repository.delete(premiere);
+        return mapper.toDomain(premiere);
     }
 
 }

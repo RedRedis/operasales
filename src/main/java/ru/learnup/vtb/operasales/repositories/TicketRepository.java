@@ -2,10 +2,10 @@ package ru.learnup.vtb.operasales.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import ru.learnup.vtb.operasales.entities.Ticket;
+import ru.learnup.vtb.operasales.repositories.entities.TicketEntity;
 
 @Repository
-public interface TicketRepository extends JpaRepository<Ticket, Long> {
+public interface TicketRepository extends JpaRepository<TicketEntity, Long> {
 
-    Ticket findByNumber(Integer number);
+    TicketEntity findByNumber(Integer number);
 }

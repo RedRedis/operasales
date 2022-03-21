@@ -1,46 +1,56 @@
 package ru.learnup.vtb.operasales.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import ru.learnup.vtb.operasales.entities.Premiere;
+import org.springframework.web.bind.annotation.*;
+import ru.learnup.vtb.operasales.controllers.dto.PremiereDto;
+import ru.learnup.vtb.operasales.mappers.PremiereMapper;
 import ru.learnup.vtb.operasales.services.PremiereService;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
-@Controller
+@RestController
+@RequestMapping("/api/v1/premiere")
 public class PremiereController {
 
-    private static PremiereService service;
+    private PremiereService service;
+    private PremiereMapper premiereMapper;
 
     @Autowired
-    public PremiereController(PremiereService service) {
+    public PremiereController(PremiereService service, PremiereMapper premiereMapper) {
         this.service = service;
+        this.premiereMapper = premiereMapper;
     }
 
-    public void getAllPremiere() {
-        List<String> names = service.getAllPremiere();
-        for (String name : names) {
-            System.out.println(name);
-        }
+    @GetMapping
+    public Collection<PremiereDto> getAll() {
+        return service.getAll().stream()
+                .map(premiereMapper::toDto)
+                .collect(Collectors.toList());
     }
 
-    public void getPremiereInfo(String name) {
-        System.out.println(service.getPremiereInfo(name));
+    @GetMapping("/{id}")
+    public PremiereDto get(@PathVariable("id") long id) {
+        return premiereMapper.toDto(
+                service.get(id));
     }
 
-    public void createPremiere(Premiere premiere) {
-        service.createPremiere(premiere);
+    @PostMapping
+    public PremiereDto save(@RequestBody PremiereDto premiereDto) {
+        return premiereMapper.toDto(
+                service.save(
+                        premiereMapper.toDomain(premiereDto)));
     }
 
-    public void changePremiere(Premiere premiere) {
-        service.changePremiere(premiere);
+    @PutMapping
+    public PremiereDto update(@RequestBody PremiereDto premiereDto) {
+        return premiereMapper.toDto(
+                service.update(
+                        premiereMapper.toDomain(premiereDto)));
     }
 
-    public void deletePremiere(String name) {
-        if (service.deletePremiere(name) != null) {
-            System.out.println("Premiere " + name + " is deleted");
-        } else {
-            System.out.println("Not such premiere in DB: " + name);
-        }
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable("id") long id) {
+        service.delete(id);
     }
 }

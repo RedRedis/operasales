@@ -1,4 +1,4 @@
-package ru.learnup.vtb.operasales.entities;
+package ru.learnup.vtb.operasales.repositories.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,19 +14,19 @@ import java.util.Objects;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Ticket {
+public class TicketEntity {
 
     @Id
     @Column(name="id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name="number")
     private Integer number;
 
     @JoinColumn(name = "name_id")
     @ManyToOne
-    private Premiere premiere;
+    private PremiereEntity premiere;
 
     @Override
     public String toString() {
@@ -37,7 +37,7 @@ public class Ticket {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Ticket ticket = (Ticket) o;
+        TicketEntity ticket = (TicketEntity) o;
         return Objects.equals(number, ticket.number) && Objects.equals(premiere, ticket.premiere);
     }
 

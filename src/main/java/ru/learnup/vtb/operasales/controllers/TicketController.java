@@ -1,34 +1,49 @@
 package ru.learnup.vtb.operasales.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import ru.learnup.vtb.operasales.entities.Ticket;
+import org.springframework.web.bind.annotation.*;
+import ru.learnup.vtb.operasales.controllers.dto.TicketDto;
+import ru.learnup.vtb.operasales.mappers.TicketMapper;
 import ru.learnup.vtb.operasales.services.TicketService;
 
-@Controller
+import java.util.Collection;
+import java.util.stream.Collectors;
+
+@RestController
+@RequestMapping("/api/v1/ticket")
 public class TicketController {
 
-    private static TicketService service;
+    private TicketService service;
+    private TicketMapper ticketMapper;
 
     @Autowired
-    public TicketController(TicketService service) {
+    public TicketController(TicketService service, TicketMapper ticketMapper) {
         this.service = service;
+        this.ticketMapper = ticketMapper;
     }
 
-    public void buyTicket(String name) {
-        Ticket ticket = service.buyTicket(name);
-        if (ticket != null) {
-            System.out.println("Ticket is bought: " + ticket.toString());
-        } else {
-            System.out.println("No seats or premiere");
-        }
+    @GetMapping
+    public Collection<TicketDto> getAll() {
+        return service.getAll().stream()
+                .map(ticketMapper::toDto)
+                .collect(Collectors.toList());
     }
 
-    public void returnTicket(Integer number) {
-        if (service.returnTicket(number)) {
-            System.out.println("ticket is returned");
-        } else {
-            System.out.println("ticket is not found");
-        }
+    @GetMapping("/{id}")
+    public TicketDto get(@PathVariable("id") long id) {
+        return ticketMapper.toDto(
+                service.get(id));
+    }
+
+    @PostMapping
+    public TicketDto save(@RequestBody TicketDto ticket) {
+        return ticketMapper.toDto(
+                service.save(
+                        ticketMapper.toDomain(ticket)));
+    }
+
+    @DeleteMapping("/{number}")
+    public void delete(@PathVariable("number") int number) {
+        service.delete(number);
     }
 }
