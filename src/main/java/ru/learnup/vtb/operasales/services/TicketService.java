@@ -1,16 +1,14 @@
 package ru.learnup.vtb.operasales.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import ru.learnup.vtb.operasales.annotations.Email;
 import ru.learnup.vtb.operasales.mappers.PremiereMapper;
 import ru.learnup.vtb.operasales.mappers.TicketMapper;
 import ru.learnup.vtb.operasales.model.Premiere;
 import ru.learnup.vtb.operasales.model.Ticket;
-import ru.learnup.vtb.operasales.repositories.entities.PremiereEntity;
-import ru.learnup.vtb.operasales.repositories.entities.TicketEntity;
 import ru.learnup.vtb.operasales.repositories.PremiereRepository;
 import ru.learnup.vtb.operasales.repositories.TicketRepository;
 
@@ -36,26 +34,27 @@ public class TicketService {
         this.ticketMapper = ticketMapper;
     }
 
-    @Transactional(readOnly = true)
+    @PreAuthorize("hasRole(\"ADMIN\")")
     public List<Ticket> getAll() {
         return ticketRepository.findAll().stream()
                 .map(ticketMapper::toDomain)
                 .collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
-    public Ticket get(long id) {
+    @PreAuthorize("hasRole(\"ADMIN\")")
+    public Ticket getInfo(long id) {
         return ticketMapper.toDomain(
                 ticketRepository.getById(id));
     }
 
-    @Email
+    //@Email
+    @PreAuthorize("hasRole(\"USER\")")
     @Transactional(
             propagation = Propagation.REQUIRES_NEW,
             timeout = 5,
             rollbackFor = {FileNotFoundException.class, IOException.class, EOFException.class}
     )
-    public Ticket save(Ticket ticket) {
+    public Ticket buyTicket(Ticket ticket) {
         Premiere premiere = premiereMapper.toDomain(repository.findByName(ticket.getPremiere().getName()));
         if (premiere != null && premiere.getAvailableSeats() > 0) {
             ticket.setNumber((int)(2_000_000_000 * Math.random()));
@@ -70,11 +69,12 @@ public class TicketService {
         return null;
     }
 
+    @PreAuthorize("hasRole(\"USER\")")
     @Transactional(
             propagation = Propagation.REQUIRES_NEW,
             rollbackFor = {FileNotFoundException.class, IOException.class, EOFException.class}
     )
-    public boolean delete(Integer number) {
+    public boolean returnTicket(Integer number) {
         Ticket ticket = ticketMapper.toDomain(
                 ticketRepository.findByNumber(number));
         if (ticket != null) {

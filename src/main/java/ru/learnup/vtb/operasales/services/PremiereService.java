@@ -1,6 +1,7 @@
 package ru.learnup.vtb.operasales.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,20 +29,19 @@ public class PremiereService {
         this.mapper = mapper;
     }
 
-    @Transactional(readOnly = true)
     public List<Premiere> getAll() {
        return repository.findAll().stream()
                .map(mapper::toDomain)
                .collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
     public Premiere get(long id) {
         return mapper.toDomain(
                 repository.getById(id));
     }
 
-    @Email
+    //@Email
+    @PreAuthorize("hasRole(\"ADMIN\")")
     @Transactional(
             propagation = Propagation.REQUIRES_NEW,
             timeout = 2,
@@ -65,7 +65,8 @@ public class PremiereService {
                         mapper.toEntity(premiere)));
     }
 
-    @Email
+    //@Email
+    @PreAuthorize("hasRole(\"ADMIN\")")
     @Transactional(
             timeout = 2,
             rollbackFor = {FileNotFoundException.class, IOException.class, EOFException.class}
@@ -96,6 +97,7 @@ public class PremiereService {
                         mapper.toEntity(premiere)));
     }
 
+    @PreAuthorize("hasRole(\"ADMIN\")")
     @Transactional(
             propagation = Propagation.REQUIRES_NEW,
             rollbackFor = {FileNotFoundException.class, IOException.class, EOFException.class}

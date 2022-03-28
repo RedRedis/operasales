@@ -32,18 +32,18 @@ public class TicketController {
     @GetMapping("/{id}")
     public TicketDto get(@PathVariable("id") long id) {
         return ticketMapper.toDto(
-                service.get(id));
+                service.getInfo(id));
     }
 
     @PostMapping
     public TicketDto save(@RequestBody TicketDto ticket) {
         return ticketMapper.toDto(
-                service.save(
+                service.buyTicket(
                         ticketMapper.toDomain(ticket)));
     }
 
     @DeleteMapping("/{number}")
     public void delete(@PathVariable("number") int number) {
-        service.delete(number);
+        service.returnTicket(number);
     }
 }
